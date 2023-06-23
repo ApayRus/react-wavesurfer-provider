@@ -124,10 +124,10 @@ export const PlayerProvider: React.FC<Props> = ({
       });
 
       wavesurferRef.current = wavesurfer;
-      // mediaElementRef.current.controls = true;
-      console.log('mediaLinkDefault');
-      console.log(mediaLinkDefault);
+      mediaElementRef.current.controls = mediaElementRef.current.controls;
     }
+    console.log('mediaLinkDefault');
+    console.log(mediaLinkDefault);
   }, [state.mediaLink, mediaLinkDefault]);
 
   const addPhrases = (newPhrasesRaw: Phrase[]) => {
