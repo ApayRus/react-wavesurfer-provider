@@ -125,6 +125,8 @@ export const PlayerProvider: React.FC<Props> = ({
 
       wavesurferRef.current = wavesurfer;
       // mediaElementRef.current.controls = true;
+      console.log('mediaLinkDefault');
+      console.log(mediaLinkDefault);
     }
   }, [state.mediaLink, mediaLinkDefault]);
 
