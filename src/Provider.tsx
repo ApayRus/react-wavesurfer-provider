@@ -128,6 +128,10 @@ export const PlayerProvider: React.FC<Props> = ({
     }
   }, [state.mediaLink]);
 
+  useEffect(() => {
+    setMediaLink(mediaLinkDefault);
+  }, [mediaLinkDefault]);
+
   const addPhrases = (newPhrasesRaw: Phrase[]) => {
     const newPhrases = newPhrasesRaw.map(phrase => {
       const id = (Math.random() + 1).toString(36).substring(7);
