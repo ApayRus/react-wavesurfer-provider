@@ -124,13 +124,9 @@ export const PlayerProvider: React.FC<Props> = ({
       });
 
       wavesurferRef.current = wavesurfer;
-      mediaElementRef.current.controls = true;
+      // mediaElementRef.current.controls = true;
     }
-  }, [state.mediaLink]);
-
-  useEffect(() => {
-    setMediaLink(mediaLinkDefault);
-  }, [mediaLinkDefault]);
+  }, [state.mediaLink, mediaLinkDefault]);
 
   const addPhrases = (newPhrasesRaw: Phrase[]) => {
     const newPhrases = newPhrasesRaw.map(phrase => {
