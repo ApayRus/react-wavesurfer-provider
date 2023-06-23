@@ -128,6 +128,8 @@ export const PlayerProvider: React.FC<Props> = ({
     }
     console.log('mediaLinkDefault');
     console.log(mediaLinkDefault);
+    console.log('mediaLinkDefault');
+    console.log(mediaLinkDefault);
   }, [state.mediaLink, mediaLinkDefault]);
 
   const addPhrases = (newPhrasesRaw: Phrase[]) => {
