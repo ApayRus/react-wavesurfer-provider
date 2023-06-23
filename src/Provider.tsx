@@ -90,42 +90,37 @@ export const PlayerProvider: React.FC<Props> = ({
   });
 
   useEffect(() => {
-    if (
-      state.mediaLink
-      // &&
-      // !wavesurferRef.current // otherwise renders waveform twice
-    ) {
-      if (waveformContainerRef.current) {
-        waveformContainerRef.current.innerHTML = '';
-      }
-      mediaElementRef.current = document.getElementById(
-        'mediaElement'
-      ) as HTMLVideoElement;
-      waveformContainerRef.current = document.getElementById(
-        'waveformContainer'
-      ) as HTMLDivElement;
-      wavesurferTimelineRef.current = document.getElementById(
-        'timelineContainer'
-      ) as HTMLDivElement;
-
-      // console.log(document.getElementById('mediaElement'))
-
-      const wavesurfer = initWavesurfer({
-        waveformContainerRef,
-        wavesurferTimelineRef,
-        mediaElementRef,
-        phrases: state.phrases.map(elem => ({
-          ...elem,
-          data: { text: elem.text },
-        })),
-        regionsOptions,
-        wavesurferOptions,
-        setPlayerState: setState,
-      });
-
-      wavesurferRef.current = wavesurfer;
-      mediaElementRef.current.controls = mediaElementRef.current.controls;
+    if (waveformContainerRef.current) {
+      waveformContainerRef.current.innerHTML = '';
     }
+    mediaElementRef.current = document.getElementById(
+      'mediaElement'
+    ) as HTMLVideoElement;
+    waveformContainerRef.current = document.getElementById(
+      'waveformContainer'
+    ) as HTMLDivElement;
+    wavesurferTimelineRef.current = document.getElementById(
+      'timelineContainer'
+    ) as HTMLDivElement;
+
+    // console.log(document.getElementById('mediaElement'))
+
+    const wavesurfer = initWavesurfer({
+      waveformContainerRef,
+      wavesurferTimelineRef,
+      mediaElementRef,
+      phrases: state.phrases.map(elem => ({
+        ...elem,
+        data: { text: elem.text },
+      })),
+      regionsOptions,
+      wavesurferOptions,
+      setPlayerState: setState,
+    });
+
+    wavesurferRef.current = wavesurfer;
+    mediaElementRef.current.controls = mediaElementRef.current.controls;
+
     console.log('state.mediaLink');
     console.log(state.mediaLink);
     console.log('mediaLinkDefault');
