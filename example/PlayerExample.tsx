@@ -1,13 +1,13 @@
 import * as React from 'react';
 import { useContext, useEffect, useRef } from 'react';
-import { PlayerContext } from '../.';
+import { Phrase, PlayerContext } from '../.';
 import { parseSubs } from 'frazy-parser';
 
 const styles = { controlsBlock: { marginTop: '1rem' } };
 
 function PlayerExample() {
+  //@ts-ignore
   const { state: playerState, methods: playerMethods } = useContext(
-    //@ts-ignore
     PlayerContext
   );
 
@@ -28,11 +28,13 @@ function PlayerExample() {
 
   const addPhrases = () => {
     if (phrasesTextareaRef.current) {
-      const phrases = parseSubs(
-        phrasesTextareaRef.current.value,
-        false
-      ).map(elem => ({ ...elem, data: { text: elem.body } }));
-      playerMethods.addPhrases(phrases);
+      const phrases = parseSubs(phrasesTextareaRef.current.value, false).map(
+        elem => {
+          const { id, start, end, body: text } = elem;
+          return { id, start, end, data: { text } };
+        }
+      ) as Phrase[];
+      playerMethods.updatePhrases({ phrases });
     }
   };
 

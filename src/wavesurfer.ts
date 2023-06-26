@@ -4,46 +4,65 @@ import RegionsPlugin, {
 } from 'wavesurfer.js/src/plugin/regions';
 import TimelinePlugin from 'wavesurfer.js/src/plugin/timeline';
 import WaveSurfer from 'wavesurfer.js';
-import { RefObject } from 'react';
 import { PlayerContextState, Phrase } from './Provider';
 import { findCurrentPhraseNum } from 'frazy-parser';
 import { WaveSurferParams } from 'wavesurfer.js/types/params';
 
 interface InitProps {
-  waveformContainerRef: RefObject<HTMLDivElement>;
-  wavesurferTimelineRef: RefObject<HTMLDivElement>;
-  mediaElementRef: RefObject<HTMLMediaElement>;
   regionsOptions?: RegionsPluginParams;
   wavesurferOptions?: WaveSurferParams;
   phrases?: Phrase[];
   setPlayerState: React.Dispatch<React.SetStateAction<PlayerContextState>>;
 }
 
+const defaultWavesurferOptions = {
+  backend: 'MediaElement',
+  // waveColor: '#A8DBA8',
+  // progressColor: '#3B8686',
+  minPxPerSec: 50,
+  // height: 100,
+  normalize: true,
+  autoCenter: true,
+  scrollParent: true,
+} as WaveSurferParams;
+
+const defaultRegionsOptions = {
+  dragSelection: true,
+  contentEditable: true,
+  removeButton: true,
+} as RegionsPluginParams;
+
 export const initWavesurfer = ({
-  waveformContainerRef,
-  wavesurferTimelineRef,
-  mediaElementRef,
   phrases,
   regionsOptions,
   wavesurferOptions,
   setPlayerState,
 }: InitProps) => {
-  console.log('init');
+  const mediaElement = document.querySelector(
+    '#mediaElement'
+  ) as HTMLMediaElement;
+
+  clearWaveformElement();
+
   const wavesurfer = WaveSurfer.create({
-    container: waveformContainerRef.current!,
+    ...defaultWavesurferOptions,
     ...wavesurferOptions,
+    container: '#waveformContainer',
     plugins: [
       RegionsPlugin.create({
         // regionsMinLength: 2,
         regions: phrases,
+        ...defaultRegionsOptions,
         ...regionsOptions,
       }),
       TimelinePlugin.create({
-        container: wavesurferTimelineRef.current!,
+        container: '#timelineContainer' /* wavesurferTimelineRef.current! */,
       }),
     ],
   });
-  wavesurfer.load(mediaElementRef.current!);
+  const { controls } = mediaElement;
+  wavesurfer.load(mediaElement);
+  mediaElement.controls = controls; //wavesurfer.load removes controls, we want to save them
 
   // UTILS
 
@@ -53,10 +72,10 @@ export const initWavesurfer = ({
       start,
       end,
       // @ts-ignore
-      data: { text },
+      data,
     } = region;
 
-    const phrase = { id, start, end, text } as Phrase;
+    const phrase = { id, start, end, data } as Phrase;
 
     setPlayerState(oldState => {
       const oldPhrases = oldState.phrases;
@@ -134,4 +153,14 @@ function updatePhrases(phrase: Phrase, phrases: Phrase[]) {
     (a, b) => a.start - b.start
   );
   return newPhrases;
+}
+
+function clearWaveformElement() {
+  const waveformContainer = document.querySelector(
+    '#waveformContainer'
+  ) as HTMLDivElement;
+
+  if (waveformContainer) {
+    waveformContainer.innerHTML = ''; //otherwise it will be doubled on each init
+  }
 }

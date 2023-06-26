@@ -5,19 +5,25 @@ import { RegionsPluginParams } from 'wavesurfer.js/src/plugin/regions';
 import { WaveSurferParams } from 'wavesurfer.js/types/params';
 import { initWavesurfer } from './wavesurfer';
 
-interface Props {
-  children: JSX.Element;
-  mediaLink?: string;
-  phrases?: Phrase[];
-  regionsOptions?: RegionsPluginParams;
-  wavesurferOptions?: WaveSurferParams;
-}
-
 export interface Phrase {
   id?: string;
   start: number;
   end: number;
-  text?: string;
+  data?: { text: string };
+}
+
+interface UpdatePhrasesProps {
+  phrases: Phrase[];
+  randomIds?: boolean;
+  replace?: boolean;
+}
+
+interface Props {
+  children: JSX.Element;
+  mediaLink?: string;
+  phrasesProps?: UpdatePhrasesProps;
+  regionsOptions?: RegionsPluginParams;
+  wavesurferOptions?: WaveSurferParams;
 }
 
 export interface PlayerContextState {
@@ -32,7 +38,7 @@ export interface PlayerContextState {
 
 interface PlayerContextMethods {
   setMediaLink: (mediaLink: string) => void;
-  addPhrases: (phrases: Phrase[]) => void;
+  updatePhrases: (props: UpdatePhrasesProps) => void;
   removePhrases: () => void;
   play: () => void;
   pause: () => void;
@@ -46,42 +52,20 @@ interface PlayerContextType {
 
 export const PlayerContext = createContext({} as PlayerContextType);
 
-const defaultWavesurferParams = {
-  backend: 'MediaElement',
-  // waveColor: '#A8DBA8',
-  // progressColor: '#3B8686',
-  minPxPerSec: 50,
-  // height: 100,
-  normalize: true,
-  autoCenter: true,
-  scrollParent: true,
-} as WaveSurferParams;
-
-const defaultRegionsPluginParams = {
-  dragSelection: true,
-  contentEditable: true,
-  removeButton: true,
-} as RegionsPluginParams;
-
 export const PlayerProvider: React.FC<Props> = ({
   children,
-  mediaLink: mediaLinkDefault = '',
-  phrases: phrasesInitial = [],
-  regionsOptions = defaultRegionsPluginParams,
-  wavesurferOptions = defaultWavesurferParams,
+  mediaLink: mediaLinkProp = '',
+  phrasesProps,
+  regionsOptions,
+  wavesurferOptions,
 }) => {
-  const mediaElementRef = useRef<HTMLVideoElement | HTMLAudioElement | null>(
-    null
-  );
-  const waveformContainerRef = useRef<HTMLDivElement | null>(null);
-  const wavesurferTimelineRef = useRef<HTMLDivElement | null>(null);
   const wavesurferRef = useRef<any>(null);
 
   const zeroPhrase = { id: '0', start: 0, end: 0 };
 
   const [state, setState] = useState<PlayerContextState>({
-    mediaLink: mediaLinkDefault,
-    phrases: [zeroPhrase, ...phrasesInitial],
+    mediaLink: mediaLinkProp,
+    phrases: [zeroPhrase, ...(phrasesProps?.phrases || [])],
     currentTime: 0,
     isPlaying: false,
     isReady: false,
@@ -90,61 +74,57 @@ export const PlayerProvider: React.FC<Props> = ({
   });
 
   useEffect(() => {
-    if (waveformContainerRef.current) {
-      waveformContainerRef.current.innerHTML = '';
-    }
-    mediaElementRef.current = document.getElementById(
-      'mediaElement'
-    ) as HTMLVideoElement;
-    waveformContainerRef.current = document.getElementById(
-      'waveformContainer'
-    ) as HTMLDivElement;
-    wavesurferTimelineRef.current = document.getElementById(
-      'timelineContainer'
-    ) as HTMLDivElement;
-
-    // console.log(document.getElementById('mediaElement'))
-
     const wavesurfer = initWavesurfer({
-      waveformContainerRef,
-      wavesurferTimelineRef,
-      mediaElementRef,
-      phrases: state.phrases.map(elem => ({
-        ...elem,
-        data: { text: elem.text },
-      })),
+      phrases: phrasesProps?.phrases,
       regionsOptions,
       wavesurferOptions,
       setPlayerState: setState,
     });
 
     wavesurferRef.current = wavesurfer;
-    mediaElementRef.current.controls = mediaElementRef.current.controls;
+    updatePhrases({ phrases: [] });
+  }, [state.mediaLink, mediaLinkProp]);
 
-    console.log('222222');
+  useEffect(() => {
+    const { phrases = [], randomIds, replace } = phrasesProps || {};
+    updatePhrases({ phrases, randomIds, replace });
+  }, [phrasesProps?.phrases]);
 
-    /*     console.log('state.mediaLink');
-    console.log(state.mediaLink);
-    console.log('mediaLinkDefault');
-    console.log(mediaLinkDefault); */
-  }, [state.mediaLink, mediaLinkDefault]);
+  const updatePhrases = ({
+    phrases = [],
+    randomIds = true,
+    replace = true,
+  }: UpdatePhrasesProps) => {
+    let newPhrases = [] as Phrase[];
+    const isPhrasesWithoutIds = phrases.filter(elem => elem.id).length === 0;
+    if (randomIds || isPhrasesWithoutIds) {
+      // add random ids (if we hadn't ids or need new original ids)
+      newPhrases = phrases.map(phrase => {
+        const id = (Math.random() + 1).toString(36).substring(7);
+        return { ...phrase, id };
+      });
+    } else {
+      newPhrases = phrases;
+    }
 
-  const addPhrases = (newPhrasesRaw: Phrase[]) => {
-    const newPhrases = newPhrasesRaw.map(phrase => {
-      const id = (Math.random() + 1).toString(36).substring(7);
-      return { ...phrase, id };
-    });
+    if (replace) {
+      wavesurferRef.current.clearRegions();
+    }
+
     newPhrases.forEach(phrase => {
       wavesurferRef.current.addRegion(phrase);
     });
+
     setState(oldState => {
       const { phrases: oldPhrases } = oldState;
-      const phrases = [...oldPhrases, ...newPhrases].sort(
-        (a, b) => a.start - b.start
-      );
+      let phrases = (replace
+        ? [...newPhrases]
+        : [...oldPhrases, ...newPhrases]
+      ).sort((a, b) => a.start - b.start);
+
       // add zero phrase if it doesn't exist
       if (!phrases.find(elem => elem.start === 0 && elem.end === 0)) {
-        phrases.unshift(zeroPhrase);
+        phrases = [zeroPhrase, ...phrases];
       }
       return { ...oldState, phrases };
     });
@@ -174,7 +154,7 @@ export const PlayerProvider: React.FC<Props> = ({
   };
 
   const methods = {
-    addPhrases,
+    updatePhrases,
     removePhrases,
     setMediaLink,
     play,
