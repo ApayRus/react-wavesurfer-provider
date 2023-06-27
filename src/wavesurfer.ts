@@ -43,6 +43,7 @@ export const initWavesurfer = ({
   ) as HTMLMediaElement;
 
   clearWaveformElement();
+  setPlayerState(oldState => ({ ...oldState, isReady: false }));
 
   const wavesurfer = WaveSurfer.create({
     ...defaultWavesurferOptions,
