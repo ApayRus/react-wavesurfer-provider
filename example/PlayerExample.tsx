@@ -6,8 +6,8 @@ import { parseSubs } from 'frazy-parser';
 const styles = { controlsBlock: { marginTop: '1rem' } };
 
 function PlayerExample() {
-  //@ts-ignore
   const { state: playerState, methods: playerMethods } = useContext(
+    //@ts-ignore
     PlayerContext
   );
 
