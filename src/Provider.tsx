@@ -35,6 +35,7 @@ export interface PlayerContextState {
   currentPhraseNum: number;
   canPlayThrough: boolean;
   loadedMetadata: boolean;
+  duration: number;
 }
 
 interface PlayerContextMethods {
