@@ -167,7 +167,7 @@ export const PlayerProvider: React.FC<Props> = ({
   const setCurrentTime = (currentTime: number) => {
     setState(oldState => ({ ...oldState, currentTime }));
     if (wavesurferRef.current) {
-      wavesurferRef.current.seekTo(currentTime);
+      wavesurferRef.current.seekTo(currentTime / state.duration);
     }
   };
 
