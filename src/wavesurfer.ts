@@ -149,6 +149,10 @@ export const initWavesurfer = ({
   });
 
   wavesurfer.on('seek', (/* region: Phrase */) => {
+    setPlayerState(oldState => ({
+      ...oldState,
+      currentTime: wavesurfer.getCurrentTime(),
+    }));
     updateCurrentPhraseNum();
   });
 
