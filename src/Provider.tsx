@@ -40,6 +40,7 @@ export interface PlayerContextState {
 
 interface PlayerContextMethods {
   setMediaLink: (mediaLink: string) => void;
+  setCurrentTime: (currentTime: number) => void;
   updatePhrases: (props: UpdatePhrasesProps) => void;
   removePhrases: () => void;
   play: () => void;
@@ -163,10 +164,18 @@ export const PlayerProvider: React.FC<Props> = ({
     }
   };
 
+  const setCurrentTime = (currentTime: number) => {
+    setState(oldState => ({ ...oldState, currentTime }));
+    if (wavesurferRef.current) {
+      wavesurferRef.current.currentTime = currentTime;
+    }
+  };
+
   const methods = {
     updatePhrases,
     removePhrases,
     setMediaLink,
+    setCurrentTime,
     play,
     pause,
     playPhrase,
