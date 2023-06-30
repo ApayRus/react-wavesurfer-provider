@@ -1,6 +1,7 @@
 import 'react-app-polyfill/ie11';
 import * as React from 'react';
-import * as ReactDOM from 'react-dom';
+// import * as ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import { PlayerProvider } from '../.';
 import PlayerExample from './PlayerExample';
 
@@ -37,6 +38,7 @@ const App = () => {
         mediaLink,
         phrasesProps,
         wavesurferOptions: { minPxPerSec: 150 },
+        peeks: [],
       }}
     >
       <PlayerExample />
@@ -44,4 +46,12 @@ const App = () => {
   );
 };
 
-ReactDOM.render(<App />, document.getElementById('root'));
+const container = document.getElementById('root');
+const root = createRoot(container!);
+root.render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>
+);
+
+// ReactDOM.render(<App />, document.getElementById('root'));

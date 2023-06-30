@@ -3,7 +3,7 @@ import * as React from 'react';
 import { createContext, useEffect, useRef, useState } from 'react';
 import { RegionsPluginParams } from 'wavesurfer.js/src/plugin/regions';
 import { WaveSurferParams } from 'wavesurfer.js/types/params';
-import { initWavesurfer } from './wavesurfer';
+import { initWavesurfer, renderWaveform } from './wavesurfer';
 
 export interface Phrase {
   id?: string;
@@ -24,6 +24,7 @@ interface Props {
   phrasesProps?: UpdatePhrasesProps;
   regionsOptions?: RegionsPluginParams;
   wavesurferOptions?: WaveSurferParams;
+  peaks: number[];
 }
 
 export interface PlayerContextState {
@@ -34,14 +35,16 @@ export interface PlayerContextState {
   isReady: boolean;
   isFinished: boolean;
   currentPhraseNum: number;
-  canPlayThrough: boolean;
-  loadedMetadata: boolean;
   duration: number;
+  peaks: number[];
 }
 
 interface PlayerContextMethods {
   setMediaLink: (mediaLink: string) => void;
   setCurrentTime: (currentTime: number) => void;
+  setPeaks: (peaks: number[]) => void;
+  calculatePeaks: () => void;
+  removePeaks: () => void;
   updatePhrases: (props: UpdatePhrasesProps) => void;
   removePhrases: () => void;
   play: () => void;
@@ -60,13 +63,12 @@ export const defaultPlayerState = {
   isReady: false,
   currentTime: 0,
   currentPhraseNum: 0,
-  canPlayThrough: false,
-  loadedMetadata: false,
   isPlaying: false,
   isFinished: false,
   duration: 0,
   mediaLink: '',
   phrases: [],
+  peaks: [],
 } as PlayerContextState;
 
 export const PlayerProvider: React.FC<Props> = ({
@@ -75,6 +77,7 @@ export const PlayerProvider: React.FC<Props> = ({
   phrasesProps,
   regionsOptions,
   wavesurferOptions,
+  peaks: peaksProp,
 }) => {
   const wavesurferRef = useRef<any>(null);
 
@@ -92,6 +95,7 @@ export const PlayerProvider: React.FC<Props> = ({
       regionsOptions,
       wavesurferOptions,
       setPlayerState: setState,
+      peaks: peaksProp,
     });
 
     wavesurferRef.current = wavesurfer;
@@ -173,11 +177,34 @@ export const PlayerProvider: React.FC<Props> = ({
     }
   };
 
+  const setPeaks = (peaks: number[]) => {
+    if (wavesurferRef.current) {
+      wavesurferRef.current.backend.setPeaks(peaks);
+      wavesurferRef.current.drawBuffer();
+    }
+  };
+
+  const calculatePeaks = () => {
+    if (wavesurferRef.current) {
+      const mediaElement = document.querySelector(
+        '#mediaElement'
+      ) as HTMLMediaElement;
+      renderWaveform({ mediaElement, wavesurfer: wavesurferRef.current });
+    }
+  };
+
+  const removePeaks = () => {
+    setPeaks([]);
+  };
+
   const methods = {
     updatePhrases,
     removePhrases,
     setMediaLink,
     setCurrentTime,
+    setPeaks,
+    calculatePeaks,
+    removePeaks,
     play,
     pause,
     playPhrase,

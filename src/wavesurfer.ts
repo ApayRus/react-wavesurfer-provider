@@ -13,6 +13,7 @@ interface InitProps {
   wavesurferOptions?: WaveSurferParams;
   phrases?: Phrase[];
   setPlayerState: React.Dispatch<React.SetStateAction<PlayerContextState>>;
+  peaks?: number[];
 }
 
 const defaultWavesurferOptions = {
@@ -37,6 +38,7 @@ export const initWavesurfer = ({
   regionsOptions,
   wavesurferOptions,
   setPlayerState,
+  peaks,
 }: InitProps) => {
   const updatePlayerState = (newValues: Partial<PlayerContextState>) => {
     setPlayerState(oldState => ({ ...oldState, ...newValues }));
@@ -54,17 +56,6 @@ export const initWavesurfer = ({
     mediaLink: oldState.mediaLink,
   }));
 
-  mediaElement.oncanplaythrough = () => {
-    updatePlayerState({ canPlayThrough: true });
-  };
-
-  mediaElement.onloadedmetadata = () => {
-    updatePlayerState({
-      duration: mediaElement.duration,
-      loadedMetadata: true,
-    });
-  };
-
   const wavesurfer = WaveSurfer.create({
     ...defaultWavesurferOptions,
     ...wavesurferOptions,
@@ -81,10 +72,8 @@ export const initWavesurfer = ({
       }),
     ],
   });
-  const { controls } = mediaElement;
-  wavesurfer.load(mediaElement);
-  mediaElement.controls = controls; //wavesurfer.load removes controls, we want to save them
 
+  renderWaveform({ mediaElement, wavesurfer, peaks });
   // UTILS
 
   const updatePhrase = (region: RegionParams) => {
@@ -117,7 +106,7 @@ export const initWavesurfer = ({
 
   //EVENT HANDLERS
   wavesurfer.on('ready', () => {
-    updatePlayerState({ isReady: true });
+    updatePlayerState({ isReady: true, duration: wavesurfer.getDuration() });
   });
 
   wavesurfer.on('audioprocess', () => {
@@ -150,7 +139,10 @@ export const initWavesurfer = ({
   });
 
   wavesurfer.on('seek', (/* region: Phrase */) => {
-    updatePlayerState({ currentTime: wavesurfer.getCurrentTime() });
+    updatePlayerState({
+      currentTime: wavesurfer.getCurrentTime(),
+      isFinished: false,
+    });
     updateCurrentPhraseNum();
   });
 
@@ -185,4 +177,24 @@ function clearWaveformElement() {
   if (waveformContainer) {
     waveformContainer.innerHTML = ''; //otherwise it will be doubled on each init
   }
+}
+
+interface RenderWaveformProps {
+  mediaElement: HTMLMediaElement;
+  wavesurfer: WaveSurfer;
+  peaks?: number[];
+}
+
+export function renderWaveform({
+  mediaElement,
+  wavesurfer,
+  peaks,
+}: RenderWaveformProps) {
+  const { controls } = mediaElement;
+  if (peaks) {
+    wavesurfer.load(mediaElement, peaks);
+  } else {
+    wavesurfer.load(mediaElement); //generate peaks on client side
+  }
+  mediaElement.controls = controls; //wavesurfer.load removes controls, we want to save them
 }

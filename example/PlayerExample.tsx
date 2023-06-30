@@ -2,8 +2,7 @@ import * as React from 'react';
 import { useContext, useEffect, useRef } from 'react';
 import { Phrase, PlayerContext } from '../.';
 import { parseSubs } from 'frazy-parser';
-
-const styles = { controlsBlock: { marginTop: '1rem' } };
+import './styles.css';
 
 function PlayerExample() {
   const { state: playerState, methods: playerMethods } = useContext(
@@ -13,6 +12,7 @@ function PlayerExample() {
 
   const mediaLinkInputRef = useRef<HTMLInputElement>(null);
   const phrasesTextareaRef = useRef<HTMLTextAreaElement>(null);
+  const peaksTextareaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
     if (mediaLinkInputRef.current) {
@@ -38,16 +38,23 @@ function PlayerExample() {
     }
   };
 
+  const addPeaks = () => {
+    if (peaksTextareaRef.current) {
+      const peaks = JSON.parse(peaksTextareaRef.current.value);
+      playerMethods.setPeaks(peaks);
+    }
+  };
+
   return (
     <>
       <video controls id="mediaElement" src={playerState.mediaLink} />
       <div id="waveformContainer" />
       <div id="timelineContainer" />
-      <div style={styles.controlsBlock}>
+      <div>
         <button onClick={() => playerMethods.play()}>play</button>
         <button onClick={() => playerMethods.pause()}>pause</button>
       </div>
-      <div style={styles.controlsBlock}>
+      <div>
         <div>
           <input type="text" placeholder="mediaLink" ref={mediaLinkInputRef} />
         </div>
@@ -55,7 +62,8 @@ function PlayerExample() {
           <button onClick={setMediaLink}>set mediaLink</button>
         </div>
       </div>
-      <div style={styles.controlsBlock}>
+      <h3>Phrases</h3>
+      <div>
         <div>
           <textarea
             ref={phrasesTextareaRef}
@@ -64,40 +72,32 @@ function PlayerExample() {
         </div>
         <div>
           <button onClick={addPhrases}>set phrases</button>
-        </div>
-      </div>
-      <div style={styles.controlsBlock}>
-        <div>
           <button onClick={() => playerMethods.removePhrases()}>
             remove phrases
           </button>
         </div>
       </div>
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'center',
-        }}
-      >
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            padding: '0.25rem',
-          }}
-        >
+      <h3>Peaks</h3>
+      <div>
+        <div>
+          <textarea ref={peaksTextareaRef} placeholder="peaks" />
+        </div>
+        <div>
+          <button onClick={addPeaks}>set peaks</button>
+          <button onClick={() => playerMethods.removePeaks()}>
+            remove peaks
+          </button>
+          <button onClick={() => playerMethods.calculatePeaks()}>
+            calculate peaks
+          </button>
+        </div>
+      </div>
+      <div>
+        <div>
           {playerState.phrases.slice(1).map((elem, index) => {
             return (
               <div
                 key={`phrase-${index}`}
-                style={{
-                  border: '1px solid blue',
-                  width: 20,
-                  margin: 5,
-                  borderRadius: 5,
-                  cursor: 'pointer',
-                }}
                 onClick={() => playerMethods.playPhrase(elem.id || '')}
               >
                 {index + 1}
@@ -105,16 +105,7 @@ function PlayerExample() {
             );
           })}
         </div>
-        <div
-          style={{
-            textAlign: 'left',
-            maxWidth: 300,
-            wordBreak: 'break-word',
-            whiteSpace: 'pre-wrap',
-          }}
-        >
-          {JSON.stringify(playerState, null, 2)}
-        </div>
+        <div>{JSON.stringify(playerState, null, 2)}</div>
       </div>
     </>
   );
