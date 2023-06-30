@@ -32,6 +32,7 @@ export interface PlayerContextState {
   currentTime: number;
   isPlaying: boolean;
   isReady: boolean;
+  isFinished: boolean;
   currentPhraseNum: number;
   canPlayThrough: boolean;
   loadedMetadata: boolean;
@@ -62,6 +63,7 @@ export const defaultPlayerState = {
   canPlayThrough: false,
   loadedMetadata: false,
   isPlaying: false,
+  isFinished: false,
   duration: 0,
   mediaLink: '',
   phrases: [],

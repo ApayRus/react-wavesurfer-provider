@@ -38,6 +38,10 @@ export const initWavesurfer = ({
   wavesurferOptions,
   setPlayerState,
 }: InitProps) => {
+  const updatePlayerState = (newValues: Partial<PlayerContextState>) => {
+    setPlayerState(oldState => ({ ...oldState, ...newValues }));
+  }; // to call setPlayerState shorter sometimes
+
   const mediaElement = document.querySelector(
     '#mediaElement'
   ) as HTMLMediaElement;
@@ -51,17 +55,14 @@ export const initWavesurfer = ({
   }));
 
   mediaElement.oncanplaythrough = () => {
-    setPlayerState(oldState => ({
-      ...oldState,
-      canPlayThrough: true,
-    }));
+    updatePlayerState({ canPlayThrough: true });
   };
 
   mediaElement.onloadedmetadata = () => {
-    setPlayerState(oldState => ({
-      ...oldState,
+    updatePlayerState({
       duration: mediaElement.duration,
-    }));
+      loadedMetadata: true,
+    });
   };
 
   const wavesurfer = WaveSurfer.create({
@@ -98,7 +99,7 @@ export const initWavesurfer = ({
     const phrase = { id, start, end, data } as Phrase;
 
     setPlayerState(oldState => {
-      const oldPhrases = oldState.phrases;
+      const { phrases: oldPhrases } = oldState;
       const phrases = updatePhrases(phrase, oldPhrases);
       return { ...oldState, phrases };
     });
@@ -108,7 +109,7 @@ export const initWavesurfer = ({
     const currentTime: number = wavesurfer.getCurrentTime() + delta;
 
     setPlayerState(oldState => {
-      const phrases = oldState.phrases;
+      const { phrases } = oldState;
       const currentPhraseNum = findCurrentPhraseNum(phrases, currentTime);
       return { ...oldState, currentPhraseNum };
     });
@@ -116,12 +117,12 @@ export const initWavesurfer = ({
 
   //EVENT HANDLERS
   wavesurfer.on('ready', () => {
-    setPlayerState(oldState => ({ ...oldState, isReady: true }));
+    updatePlayerState({ isReady: true });
   });
 
   wavesurfer.on('audioprocess', () => {
     const currentTime = wavesurfer.getCurrentTime();
-    setPlayerState(oldState => ({ ...oldState, currentTime }));
+    updatePlayerState({ currentTime });
   });
 
   wavesurfer.on('region-click', (region, event) => {
@@ -130,7 +131,7 @@ export const initWavesurfer = ({
   });
   wavesurfer.on('region-removed', (region /* event */) => {
     setPlayerState(oldState => {
-      const oldPhrases = oldState.phrases;
+      const { phrases: oldPhrases } = oldState;
       const phrases = oldPhrases.filter(elem => elem.id !== region.id);
       return { ...oldState, phrases };
     });
@@ -149,23 +150,20 @@ export const initWavesurfer = ({
   });
 
   wavesurfer.on('seek', (/* region: Phrase */) => {
-    setPlayerState(oldState => ({
-      ...oldState,
-      currentTime: wavesurfer.getCurrentTime(),
-    }));
+    updatePlayerState({ currentTime: wavesurfer.getCurrentTime() });
     updateCurrentPhraseNum();
   });
 
   wavesurfer.on('play', (/* region: Phrase */) => {
-    setPlayerState(oldState => ({ ...oldState, isPlaying: true }));
+    updatePlayerState({ isPlaying: true });
   });
 
   wavesurfer.on('pause', (/* region: Phrase */) => {
-    setPlayerState(oldState => ({ ...oldState, isPlaying: false }));
+    updatePlayerState({ isPlaying: false });
   });
 
   wavesurfer.on('finish', (/* region: Phrase */) => {
-    setPlayerState(oldState => ({ ...oldState, isPlaying: false }));
+    updatePlayerState({ isPlaying: false, isFinished: true });
   });
 
   return wavesurfer;
