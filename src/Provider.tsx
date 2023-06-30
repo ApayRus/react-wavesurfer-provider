@@ -24,7 +24,7 @@ interface Props {
   phrasesProps?: UpdatePhrasesProps;
   regionsOptions?: RegionsPluginParams;
   wavesurferOptions?: WaveSurferParams;
-  peaks: number[];
+  peaks?: number[];
 }
 
 export interface PlayerContextState {
