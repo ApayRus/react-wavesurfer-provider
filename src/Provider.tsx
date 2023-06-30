@@ -32,8 +32,9 @@ export interface PlayerContextState {
   currentTime: number;
   isPlaying: boolean;
   isReady: boolean;
-  currentPhraseId: string;
   currentPhraseNum: number;
+  canPlayThrough: boolean;
+  loadedMetadata: boolean;
 }
 
 interface PlayerContextMethods {
@@ -52,6 +53,18 @@ interface PlayerContextType {
 
 export const PlayerContext = createContext({} as PlayerContextType);
 
+export const defaultPlayerState = {
+  isReady: false,
+  currentTime: 0,
+  currentPhraseNum: 0,
+  canPlayThrough: false,
+  loadedMetadata: false,
+  isPlaying: false,
+  duration: 0,
+  mediaLink: '',
+  phrases: [],
+} as PlayerContextState;
+
 export const PlayerProvider: React.FC<Props> = ({
   children,
   mediaLink: mediaLinkProp = '',
@@ -64,13 +77,9 @@ export const PlayerProvider: React.FC<Props> = ({
   const zeroPhrase = { id: '0', start: 0, end: 0 };
 
   const [state, setState] = useState<PlayerContextState>({
+    ...defaultPlayerState,
     mediaLink: mediaLinkProp,
     phrases: [zeroPhrase, ...(phrasesProps?.phrases || [])],
-    currentTime: 0,
-    isPlaying: false,
-    isReady: false,
-    currentPhraseId: '',
-    currentPhraseNum: 0,
   });
 
   useEffect(() => {

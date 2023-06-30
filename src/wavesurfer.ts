@@ -4,7 +4,7 @@ import RegionsPlugin, {
 } from 'wavesurfer.js/src/plugin/regions';
 import TimelinePlugin from 'wavesurfer.js/src/plugin/timeline';
 import WaveSurfer from 'wavesurfer.js';
-import { PlayerContextState, Phrase } from './Provider';
+import { PlayerContextState, Phrase, defaultPlayerState } from './Provider';
 import { findCurrentPhraseNum } from 'frazy-parser';
 import { WaveSurferParams } from 'wavesurfer.js/types/params';
 
@@ -43,7 +43,26 @@ export const initWavesurfer = ({
   ) as HTMLMediaElement;
 
   clearWaveformElement();
-  setPlayerState(oldState => ({ ...oldState, isReady: false }));
+
+  setPlayerState(oldState => ({
+    ...oldState,
+    ...defaultPlayerState,
+    mediaLink: oldState.mediaLink,
+  }));
+
+  mediaElement.oncanplaythrough = () => {
+    setPlayerState(oldState => ({
+      ...oldState,
+      canPlayThrough: true,
+    }));
+  };
+
+  mediaElement.onloadedmetadata = () => {
+    setPlayerState(oldState => ({
+      ...oldState,
+      duration: mediaElement.duration,
+    }));
+  };
 
   const wavesurfer = WaveSurfer.create({
     ...defaultWavesurferOptions,
