@@ -115,9 +115,11 @@ export const initWavesurfer = ({
   });
 
   wavesurfer.on('region-click', (region, event) => {
+    updatePlayerState({ playMode: 'phrase' });
     event.stopPropagation();
     region.play();
   });
+
   wavesurfer.on('region-removed', (region /* event */) => {
     setPlayerState(oldState => {
       const { phrases: oldPhrases } = oldState;
@@ -138,6 +140,10 @@ export const initWavesurfer = ({
     updateCurrentPhraseNum();
   });
 
+  wavesurfer.on('region-out', (/* region: Phrase */) => {
+    updateCurrentPhraseNum();
+  });
+
   wavesurfer.on('seek', (/* region: Phrase */) => {
     updatePlayerState({
       currentTime: wavesurfer.getCurrentTime(),
@@ -151,7 +157,7 @@ export const initWavesurfer = ({
   });
 
   wavesurfer.on('pause', (/* region: Phrase */) => {
-    updatePlayerState({ isPlaying: false });
+    updatePlayerState({ isPlaying: false, playMode: 'all' });
   });
 
   wavesurfer.on('finish', (/* region: Phrase */) => {

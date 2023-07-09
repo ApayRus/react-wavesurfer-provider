@@ -4,6 +4,7 @@ import { createContext, useEffect, useRef, useState } from 'react';
 import { RegionsPluginParams } from 'wavesurfer.js/src/plugin/regions';
 import { WaveSurferParams } from 'wavesurfer.js/types/params';
 import { initWavesurfer, renderWaveform } from './wavesurfer';
+import WaveSurfer from 'wavesurfer.js';
 
 export interface Phrase {
   id?: string;
@@ -37,6 +38,7 @@ export interface PlayerContextState {
   currentPhraseNum: number;
   duration: number;
   peaks: number[];
+  playMode: 'all' | 'phrase' /*  | 'dictation' */;
 }
 
 interface PlayerContextMethods {
@@ -69,6 +71,7 @@ export const defaultPlayerState = {
   mediaLink: '',
   phrases: [],
   peaks: [],
+  playMode: 'all',
 } as PlayerContextState;
 
 export const PlayerProvider: React.FC<Props> = ({
@@ -79,7 +82,7 @@ export const PlayerProvider: React.FC<Props> = ({
   wavesurferOptions,
   peaks: peaksProp,
 }) => {
-  const wavesurferRef = useRef<any>(null);
+  const wavesurferRef = useRef<WaveSurfer | null>(null);
 
   const zeroPhrase = { id: '0', start: 0, end: 0 };
 
@@ -125,11 +128,15 @@ export const PlayerProvider: React.FC<Props> = ({
     }
 
     if (replace) {
-      wavesurferRef.current.clearRegions();
+      if (wavesurferRef.current) {
+        wavesurferRef.current.clearRegions();
+      }
     }
 
     newPhrases.forEach(phrase => {
-      wavesurferRef.current.addRegion(phrase);
+      if (wavesurferRef.current) {
+        wavesurferRef.current.addRegion(phrase);
+      }
     });
 
     setState(oldState => {
@@ -148,8 +155,10 @@ export const PlayerProvider: React.FC<Props> = ({
   };
 
   const removePhrases = () => {
-    wavesurferRef.current.clearRegions();
-    setState(oldState => ({ ...oldState, phrases: [zeroPhrase] }));
+    if (wavesurferRef.current) {
+      wavesurferRef.current.clearRegions();
+      setState(oldState => ({ ...oldState, phrases: [zeroPhrase] }));
+    }
   };
 
   const setMediaLink = (mediaLink: string) => {
@@ -157,15 +166,20 @@ export const PlayerProvider: React.FC<Props> = ({
   };
 
   const play = () => {
-    wavesurferRef.current.play();
+    if (wavesurferRef.current) {
+      wavesurferRef.current.play();
+    }
   };
 
   const pause = () => {
-    wavesurferRef.current.pause();
+    if (wavesurferRef.current) {
+      wavesurferRef.current.pause();
+    }
   };
 
   const playPhrase = (phraseId: string) => {
     if (wavesurferRef.current) {
+      setState(oldState => ({ ...oldState, playMode: 'phrase' }));
       wavesurferRef.current.regions.list[phraseId].play();
     }
   };
