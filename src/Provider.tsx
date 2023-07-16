@@ -28,7 +28,7 @@ interface Props {
   peaks?: number[];
 }
 
-type DelayMeasure = 'phrase length' | 'seconds';
+export type DelayMeasure = 'phrase length' | 'seconds';
 
 export interface PlayerContextState {
   phrases: Phrase[];
