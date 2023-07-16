@@ -92,6 +92,10 @@ export const PlayerProvider: React.FC<Props> = ({
     phrases: [zeroPhrase, ...(phrasesProps?.phrases || [])],
   });
 
+  const updateState = (newValues: Partial<PlayerContextState>) => {
+    setState(oldState => ({ ...oldState, ...newValues }));
+  };
+
   useEffect(() => {
     const wavesurfer = initWavesurfer({
       phrases: phrasesProps?.phrases,
@@ -157,12 +161,12 @@ export const PlayerProvider: React.FC<Props> = ({
   const removePhrases = () => {
     if (wavesurferRef.current) {
       wavesurferRef.current.clearRegions();
-      setState(oldState => ({ ...oldState, phrases: [zeroPhrase] }));
+      updateState({ phrases: [zeroPhrase] });
     }
   };
 
   const setMediaLink = (mediaLink: string) => {
-    setState(oldState => ({ ...oldState, mediaLink }));
+    updateState({ mediaLink });
   };
 
   const play = () => {
@@ -179,13 +183,13 @@ export const PlayerProvider: React.FC<Props> = ({
 
   const playPhrase = (phraseId: string) => {
     if (wavesurferRef.current) {
-      setState(oldState => ({ ...oldState, playMode: 'phrase' }));
+      updateState({ playMode: 'phrase' });
       wavesurferRef.current.regions.list[phraseId].play();
     }
   };
 
   const setCurrentTime = (currentTime: number) => {
-    setState(oldState => ({ ...oldState, currentTime }));
+    updateState({ playMode: 'phrase' });
     if (wavesurferRef.current) {
       wavesurferRef.current.seekTo(currentTime / state.duration);
     }
