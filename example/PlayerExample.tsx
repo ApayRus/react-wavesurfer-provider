@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useContext, useEffect, useRef } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { Phrase, PlayerContext } from '../.';
 import { parseSubs } from 'frazy-parser';
 import './styles.css';
@@ -10,64 +10,145 @@ function PlayerExample() {
     PlayerContext
   );
 
-  const mediaLinkInputRef = useRef<HTMLInputElement>(null);
-  const phrasesTextareaRef = useRef<HTMLTextAreaElement>(null);
-  const peaksTextareaRef = useRef<HTMLTextAreaElement>(null);
+  const [formState, setFormState] = useState({
+    mediaLink: '',
+    repeatDelay: 1,
+    repeatCount: 2,
+    delayMeasure: 'phrase length',
+    phrasesTextarea: '',
+    peaksTextarea: '',
+  });
+
+  const updateFormState = newValues => {
+    setFormState(oldState => ({
+      ...oldState,
+      ...newValues,
+    }));
+  };
+
+  const onChange = event => {
+    const {
+      target: { id, value },
+    } = event;
+    updateFormState({ [id]: value });
+    const playerStateIds = ['repeatDelay', 'repeatCount', 'delayMeasure'];
+    if (playerStateIds.includes(id)) {
+      playerMethods.updateState({ [id]: value });
+    }
+  };
 
   useEffect(() => {
-    if (mediaLinkInputRef.current) {
-      mediaLinkInputRef.current.value = playerState.mediaLink;
-    }
+    updateFormState({
+      mediaLink: playerState.mediaLink,
+      repeatDelay: playerState.repeatDelay,
+      repeatCount: playerState.repeatCount,
+      delayMeasure: playerState.delayMeasure,
+    });
   }, []);
 
   const setMediaLink = () => {
-    if (mediaLinkInputRef.current) {
-      playerMethods.setMediaLink(mediaLinkInputRef.current.value);
-    }
+    playerMethods.setMediaLink(formState.mediaLink);
   };
 
   const addPhrases = () => {
-    if (phrasesTextareaRef.current) {
-      const phrases = parseSubs(phrasesTextareaRef.current.value, false).map(
-        elem => {
-          const { id, start, end, body: text } = elem;
-          return { id, start, end, data: { text } };
-        }
-      ) as Phrase[];
-      playerMethods.updatePhrases({ phrases });
-    }
+    const phrases = parseSubs(formState.phrasesTextarea, false).map(elem => {
+      const { id, start, end, body: text } = elem;
+      return { id, start, end, data: { text } };
+    }) as Phrase[];
+    playerMethods.updatePhrases({ phrases });
   };
 
   const addPeaks = () => {
-    if (peaksTextareaRef.current) {
-      const peaks = JSON.parse(peaksTextareaRef.current.value);
-      playerMethods.setPeaks(peaks);
-    }
+    const peaks = JSON.parse(formState.peaksTextarea);
+    playerMethods.setPeaks(peaks);
   };
 
   return (
     <>
-      <video controls id="mediaElement" src={playerState.mediaLink} />
-      <div id="waveformContainer" />
-      <div id="timelineContainer" />
-      <div>
-        <button onClick={() => playerMethods.play()}>play</button>
-        <button onClick={() => playerMethods.pause()}>pause</button>
-      </div>
-      <div>
+      <section className="player">
+        <video controls id="mediaElement" src={playerState.mediaLink} />
+        <div id="waveformContainer" />
+        <div id="timelineContainer" />
+      </section>
+      <section className="mediaControls">
+        <h3>Media controls</h3>
         <div>
-          <input type="text" placeholder="mediaLink" ref={mediaLinkInputRef} />
+          <button onClick={() => playerMethods.play()}>play</button>
+          <button onClick={() => playerMethods.pause()}>pause</button>
         </div>
         <div>
+          <input
+            type="text"
+            placeholder="mediaLink"
+            id="mediaLink"
+            value={formState.mediaLink}
+            {...{ onChange }}
+          />
           <button onClick={setMediaLink}>set mediaLink</button>
         </div>
-      </div>
-      <h3>Phrases</h3>
-      <div>
+      </section>
+      <section className="dictation">
+        <h3>Dictation</h3>
+        <div>
+          <label htmlFor="repeatDelay">Repeat delay</label>
+          <input
+            type="number"
+            placeholder="repeatDelay"
+            id="repeatDelay"
+            min="1"
+            value={formState.repeatDelay}
+            {...{ onChange }}
+          />
+        </div>
+        <div>
+          <label htmlFor="repeatCount">Repeat count</label>
+          <input
+            type="number"
+            placeholder="repeatCount"
+            id="repeatCount"
+            min="1"
+            value={formState.repeatCount}
+            {...{ onChange }}
+          />
+        </div>
+        <div>
+          <label htmlFor="delayMeasure">Delay measure</label>
+          <select
+            {...{ onChange }}
+            id="delayMeasure"
+            value={formState.delayMeasure}
+            {...{ onChange }}
+          >
+            <option value="phrase length">phrase length</option>
+            <option value="seconds">seconds</option>
+          </select>
+        </div>
+
+        <button onClick={() => playerMethods.playDictation()}>
+          play dictation
+        </button>
+      </section>
+      <section className="phrases">
+        <h3>Phrases</h3>
+        <div className="phrasesToPlay">
+          Click to play phrase:{' '}
+          {playerState.phrases.slice(1).map((elem, index) => {
+            return (
+              <div
+                key={`phrase-${index}`}
+                onClick={() => playerMethods.playPhrase(elem.id || '')}
+                className="phrase"
+              >
+                {index + 1}
+              </div>
+            );
+          })}
+        </div>
         <div>
           <textarea
-            ref={phrasesTextareaRef}
+            id="phrasesTextarea"
             placeholder="phrases (captions, subtitles, timed text)"
+            {...{ onChange }}
           />
         </div>
         <div>
@@ -76,11 +157,11 @@ function PlayerExample() {
             remove phrases
           </button>
         </div>
-      </div>
-      <h3>Peaks</h3>
-      <div>
+      </section>
+      <section className="peaks">
+        <h3>Peaks</h3>
         <div>
-          <textarea ref={peaksTextareaRef} placeholder="peaks" />
+          <textarea id="peaksTextarea" placeholder="peaks" {...{ onChange }} />
         </div>
         <div>
           <button onClick={addPeaks}>set peaks</button>
@@ -91,22 +172,10 @@ function PlayerExample() {
             calculate peaks
           </button>
         </div>
-      </div>
-      <div>
-        <div>
-          {playerState.phrases.slice(1).map((elem, index) => {
-            return (
-              <div
-                key={`phrase-${index}`}
-                onClick={() => playerMethods.playPhrase(elem.id || '')}
-              >
-                {index + 1}
-              </div>
-            );
-          })}
-        </div>
-        <div>{JSON.stringify(playerState, null, 2)}</div>
-      </div>
+      </section>
+      <section className="playerStateCode">
+        <pre>{JSON.stringify(playerState, null, 2)}</pre>
+      </section>
     </>
   );
 }
