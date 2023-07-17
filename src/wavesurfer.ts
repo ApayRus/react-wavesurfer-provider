@@ -157,7 +157,15 @@ export const initWavesurfer = ({
   });
 
   wavesurfer.on('pause', (/* region: Phrase */) => {
-    updatePlayerState({ isPlaying: false, playMode: 'all' });
+    //when a region was played by clicking on the waveform region
+    setPlayerState(oldState => {
+      const { playMode } = oldState;
+      if (playMode !== 'dictation') {
+        return { ...oldState, isPlaying: false, playMode: 'all' };
+      } else {
+        return { ...oldState, isPlaying: false };
+      }
+    });
   });
 
   wavesurfer.on('finish', (/* region: Phrase */) => {

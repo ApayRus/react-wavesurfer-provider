@@ -40,14 +40,17 @@ function PlayerExample() {
   useEffect(() => {
     updateFormState({
       mediaLink: playerState.mediaLink,
-      repeatDelay: playerState.repeatDelay,
-      repeatCount: playerState.repeatCount,
-      delayMeasure: playerState.delayMeasure,
     });
   }, []);
 
   const setMediaLink = () => {
     playerMethods.setMediaLink(formState.mediaLink);
+  };
+
+  const playDictation = () => {
+    const { repeatCount, repeatDelay, delayMeasure } = formState;
+    //@ts-ignore
+    playerMethods.playDictation({ repeatCount, repeatDelay, delayMeasure });
   };
 
   const addPhrases = () => {
@@ -124,9 +127,7 @@ function PlayerExample() {
           </select>
         </div>
 
-        <button onClick={() => playerMethods.playDictation()}>
-          play dictation
-        </button>
+        <button onClick={playDictation}>play dictation</button>
       </section>
       <section className="phrases">
         <h3>Phrases</h3>

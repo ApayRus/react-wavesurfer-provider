@@ -42,13 +42,16 @@ export interface PlayerContextState {
   peaks: number[];
   playMode: 'all' | 'phrase' | 'dictation';
   //dictation:
-  repeatCount: number;
-  repeatDelay: number;
   currentRepeatNum: number;
-  delayMeasure: DelayMeasure;
   timerId: number;
   // repeatTimer: number; // seconds to play next repeat
   // repeatTimerId: number;
+}
+
+interface PlayDictationProps {
+  repeatCount: number;
+  repeatDelay: number;
+  delayMeasure: DelayMeasure;
 }
 
 interface PlayerContextMethods {
@@ -65,7 +68,7 @@ interface PlayerContextMethods {
   play: () => void;
   pause: () => void;
   playPhrase: (phraseId: string) => void;
-  playDictation: () => void;
+  playDictation: (props: PlayDictationProps) => void;
   updateState: (newValues: Partial<PlayerContextState>) => void;
 }
 
@@ -84,17 +87,14 @@ export const defaultPlayerState = {
   isFinished: false,
   duration: 0,
   mediaLink: '',
-  phrases: [],
   peaks: [],
   playMode: 'all',
   //dictation
-  repeatCount: 2,
-  repeatDelay: 2,
   currentRepeatNum: 1,
-  delayMeasure: 'phrase length',
   timerId: 0,
-  // repeatTimer:0,
+  // repeatTimer:0, // seconds to next repeat
   // repeatTimerId:0
+  phrases: [],
 } as PlayerContextState;
 
 export const PlayerProvider: React.FC<Props> = ({
@@ -192,21 +192,10 @@ export const PlayerProvider: React.FC<Props> = ({
     updateState({ mediaLink });
   };
 
-  const setRepeatCount = (repeatCount: number) => {
-    updateState({ repeatCount });
-  };
-
-  const setRepeatDelay = (repeatDelay: number) => {
-    updateState({ repeatDelay });
-  };
-
-  const setDelayMeasure = (delayMeasure: DelayMeasure) => {
-    updateState({ delayMeasure });
-  };
-
   const play = () => {
     if (wavesurferRef.current) {
       stopDictation();
+      updateState({ playMode: 'all' });
       wavesurferRef.current.play();
     }
   };
@@ -214,6 +203,7 @@ export const PlayerProvider: React.FC<Props> = ({
   const pause = () => {
     if (wavesurferRef.current) {
       stopDictation();
+      updateState({ playMode: 'all' });
       wavesurferRef.current.pause();
     }
   };
@@ -256,7 +246,7 @@ export const PlayerProvider: React.FC<Props> = ({
 
   const stopDictation = () => {
     clearTimeout(state.timerId);
-    updateState({ timerId: 0, playMode: 'all' });
+    updateState({ timerId: 0 });
   };
 
   interface PlayDictationPhraseProps {
@@ -264,6 +254,7 @@ export const PlayerProvider: React.FC<Props> = ({
     phraseNum: number;
     repeatCount: number;
     repeatDelay: number;
+    delayMeasure: DelayMeasure;
   }
 
   const playDictationPhrase = ({
@@ -271,6 +262,7 @@ export const PlayerProvider: React.FC<Props> = ({
     phraseNum,
     repeatCount,
     repeatDelay,
+    delayMeasure,
   }: PlayDictationPhraseProps) => {
     const { phrases } = state;
     if (phraseNum === phrases.length) return;
@@ -278,7 +270,7 @@ export const PlayerProvider: React.FC<Props> = ({
     const { id = '0', start, end } = phrase;
     const phraseLength = end - start;
     const delaySeconds =
-      state.delayMeasure === 'phrase length'
+      delayMeasure === 'phrase length'
         ? phraseLength * repeatDelay
         : repeatDelay;
 
@@ -291,35 +283,45 @@ export const PlayerProvider: React.FC<Props> = ({
           phraseNum,
           repeatCount,
           repeatDelay,
+          delayMeasure,
         });
-      } else {
+      }
+      if (currentRepeatNum == repeatCount) {
         playDictationPhrase({
           currentRepeatNum: 1,
           phraseNum: phraseNum + 1,
           repeatCount,
           repeatDelay,
+          delayMeasure,
         });
       }
+      if (phraseNum === phrases.length - 1) {
+        stopDictation();
+        updateState({ isFinished: true });
+      }
     }, delaySeconds * 1000);
+
     //@ts-ignore
     updateState({ timerId });
     updateState({ currentRepeatNum });
   };
 
-  const playDictation = () => {
-    const { currentPhraseNum, repeatCount, repeatDelay, timerId } = state;
+  const playDictation = ({
+    repeatCount,
+    repeatDelay,
+    delayMeasure,
+  }: PlayDictationProps) => {
+    stopDictation();
+    const { currentPhraseNum } = state;
     updateState({ playMode: 'dictation' });
     const beginFrom = currentPhraseNum <= 0 ? 1 : currentPhraseNum;
-    if (!timerId) {
-      playDictationPhrase({
-        currentRepeatNum: 1,
-        phraseNum: beginFrom,
-        repeatCount,
-        repeatDelay,
-      });
-    } else {
-      stopDictation();
-    }
+    playDictationPhrase({
+      currentRepeatNum: 1,
+      phraseNum: beginFrom,
+      repeatCount,
+      repeatDelay,
+      delayMeasure,
+    });
   };
 
   const removePeaks = () => {
@@ -330,9 +332,6 @@ export const PlayerProvider: React.FC<Props> = ({
     updatePhrases,
     removePhrases,
     setMediaLink,
-    setRepeatDelay,
-    setRepeatCount,
-    setDelayMeasure,
     setCurrentTime,
     setPeaks,
     calculatePeaks,
