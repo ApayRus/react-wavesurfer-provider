@@ -217,7 +217,11 @@ export const PlayerProvider: React.FC<Props> = ({
   };
 
   const playDictationPhraseOnce = (phraseId: string) => {
+    console.log('phraseId');
+    console.log(phraseId);
     if (wavesurferRef.current) {
+      console.log('wavesurferRef.current');
+      console.log(wavesurferRef.current);
       wavesurferRef.current.regions.list[phraseId].play();
     }
   };
