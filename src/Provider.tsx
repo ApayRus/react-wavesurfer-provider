@@ -28,7 +28,7 @@ interface Props {
   peaks?: number[];
 }
 
-export type DelayMeasure = 'phrase length' | 'seconds';
+export type DelayMeasure = 'phraseLength' | 'seconds';
 
 export interface PlayerContextState {
   phrases: Phrase[];
@@ -270,9 +270,9 @@ export const PlayerProvider: React.FC<Props> = ({
     const { id = '0', start, end } = phrase;
     const phraseLength = end - start;
     const delaySeconds =
-      delayMeasure === 'phrase length'
+      delayMeasure === 'phraseLength'
         ? phraseLength * repeatDelay
-        : repeatDelay;
+        : phraseLength + repeatDelay;
 
     playDictationPhraseOnce(id);
 
