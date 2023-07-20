@@ -17,6 +17,7 @@ function PlayerExample() {
     delayMeasure: 'phrase length',
     phrasesTextarea: '',
     peaksTextarea: '',
+    playbackRate: 1,
   });
 
   const updateFormState = newValues => {
@@ -34,6 +35,9 @@ function PlayerExample() {
     const playerStateIds = ['repeatDelay', 'repeatCount', 'delayMeasure'];
     if (playerStateIds.includes(id)) {
       playerMethods.updateState({ [id]: value });
+    }
+    if (id === 'playbackRate') {
+      playerMethods.setPlaybackRate(value);
     }
   };
 
@@ -78,6 +82,17 @@ function PlayerExample() {
         <div>
           <button onClick={() => playerMethods.play()}>play</button>
           <button onClick={() => playerMethods.pause()}>pause</button>
+          <label htmlFor="playbackRate">Speed</label>
+          <input
+            type="number"
+            placeholder="speed"
+            id="playbackRate"
+            min="0.25"
+            max="2"
+            step="0.25"
+            value={formState.playbackRate}
+            {...{ onChange }}
+          />
         </div>
         <div>
           <input

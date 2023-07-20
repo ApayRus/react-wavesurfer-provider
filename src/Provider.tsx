@@ -70,6 +70,7 @@ interface PlayerContextMethods {
   playPhrase: (phraseId: string) => void;
   playDictation: (props: PlayDictationProps) => void;
   updateState: (newValues: Partial<PlayerContextState>) => void;
+  setPlaybackRate: (rate: number) => void;
 }
 
 interface PlayerContextType {
@@ -228,6 +229,10 @@ export const PlayerProvider: React.FC<Props> = ({
     }
   };
 
+  const setPlaybackRate = (rate: number) => {
+    wavesurferRef.current?.setPlaybackRate(rate);
+  };
+
   const setPeaks = (peaks: number[]) => {
     if (wavesurferRef.current) {
       wavesurferRef.current.backend.setPeaks(peaks);
@@ -344,6 +349,7 @@ export const PlayerProvider: React.FC<Props> = ({
     playPhrase,
     playDictation,
     updateState,
+    setPlaybackRate,
   } as PlayerContextMethods;
 
   return (
