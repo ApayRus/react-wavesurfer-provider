@@ -5,6 +5,7 @@ import { RegionsPluginParams } from 'wavesurfer.js/src/plugin/regions';
 import { WaveSurferParams } from 'wavesurfer.js/types/params';
 import { initWavesurfer, renderWaveform } from './wavesurfer';
 import WaveSurfer from 'wavesurfer.js';
+import merge from 'lodash-es/merge';
 
 export interface Phrase {
   id?: string;
@@ -64,6 +65,7 @@ interface PlayerContextMethods {
   calculatePeaks: () => void;
   removePeaks: () => void;
   updatePhrases: (props: UpdatePhrasesProps) => void;
+  updatePhrase: (phraseUpdate: Partial<Phrase>) => void;
   removePhrases: () => void;
   play: () => void;
   pause: () => void;
@@ -180,6 +182,21 @@ export const PlayerProvider: React.FC<Props> = ({
       }
       return { ...oldState, phrases };
     });
+  };
+
+  const updatePhrase = (phraseUpdate: Partial<Phrase>) => {
+    const { id = '' } = phraseUpdate;
+    const { phrases } = { ...state };
+    const region = wavesurferRef.current?.regions.list[id];
+    const regionUpdated = merge(region, phraseUpdate);
+    if (wavesurferRef.current) {
+      wavesurferRef.current.regions.list[id] = regionUpdated;
+    }
+    const phrase = phrases.find(elem => elem.id === id);
+    const phraseIndex = phrases.findIndex(elem => elem.id === id);
+    const phraseUpdated = merge(phrase, phraseUpdate);
+    phrases[phraseIndex] = phraseUpdated;
+    updatePhrases({ phrases, randomIds: false });
   };
 
   const removePhrases = () => {
@@ -338,6 +355,7 @@ export const PlayerProvider: React.FC<Props> = ({
 
   const methods = {
     updatePhrases,
+    updatePhrase,
     removePhrases,
     setMediaLink,
     setCurrentTime,

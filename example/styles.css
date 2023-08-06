@@ -14,15 +14,20 @@ button {
   max-width: 360px;
 }
 
-.phrases .phrase {
+.phrase .text,
+.phrase .num {
+  display: inline-block;
+}
+
+.phrase .num {
   display: inline-block;
   border: 1px solid gold;
   padding: 2px;
   margin: 2px;
   cursor: pointer;
+  border-radius: 50%;
   min-width: 20px;
   min-height: 20px;
-  border-radius: 50%;
   text-align: center;
 }
 

@@ -150,12 +150,25 @@ function PlayerExample() {
           Click to play phrase:{' '}
           {playerState.phrases.slice(1).map((elem, index) => {
             return (
-              <div
-                key={`phrase-${index}`}
-                onClick={() => playerMethods.playPhrase(elem.id || '')}
-                className="phrase"
-              >
-                {index + 1}
+              <div className="phrase" key={`phrase-${index}`}>
+                <div
+                  className="num"
+                  onClick={() => playerMethods.playPhrase(elem.id || '')}
+                >
+                  {index + 1}
+                </div>
+                <div
+                  id={elem.id}
+                  className="text"
+                  contentEditable="true"
+                  onBlur={e => {
+                    const { currentTarget } = e;
+                    const { id, innerText: text } = currentTarget;
+                    playerMethods.updatePhrase({ id, data: { text } });
+                  }}
+                >
+                  {elem?.data?.text}
+                </div>
               </div>
             );
           })}
