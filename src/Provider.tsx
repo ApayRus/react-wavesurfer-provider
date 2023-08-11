@@ -62,6 +62,7 @@ interface PlayerContextMethods {
   setRepeatDelay: (repeatDelay: number) => void;
   setRepeatCount: (repeatCount: number) => void;
   setDelayMeasure: (delayMeasure: DelayMeasure) => void;
+  getWavesurferInstance: () => WaveSurfer | null;
   calculatePeaks: () => void;
   removePeaks: () => void;
   updatePhrases: (props: UpdatePhrasesProps) => void;
@@ -353,6 +354,10 @@ export const PlayerProvider: React.FC<Props> = ({
     setPeaks([]);
   };
 
+  const getWavesurferInstance = () => {
+    return wavesurferRef.current;
+  };
+
   const methods = {
     updatePhrases,
     updatePhrase,
@@ -368,6 +373,7 @@ export const PlayerProvider: React.FC<Props> = ({
     playDictation,
     updateState,
     setPlaybackRate,
+    getWavesurferInstance,
   } as PlayerContextMethods;
 
   return (
