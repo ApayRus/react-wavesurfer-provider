@@ -128,7 +128,7 @@ export const initWavesurfer = ({
     });
   });
 
-  wavesurfer.on('region-updated', (region: Phrase /* event */) => {
+  wavesurfer.on('region-update-end', (region: Phrase /* event */) => {
     updatePhrase(region);
   });
 
