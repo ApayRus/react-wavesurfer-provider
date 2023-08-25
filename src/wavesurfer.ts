@@ -133,7 +133,6 @@ export const initWavesurfer = ({
   // });
 
   wavesurfer.on('region-update-end', (region: Phrase /* event */) => {
-    console.log('region-update-end');
     updatePhrase(region);
   });
 
