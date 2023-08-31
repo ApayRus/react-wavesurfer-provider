@@ -67,6 +67,7 @@ interface PlayerContextMethods {
   removePeaks: () => void;
   updatePhrases: (props: UpdatePhrasesProps) => void;
   updatePhrase: (phraseUpdate: Partial<Phrase>) => void;
+  removePhrase: (id: string) => void;
   removePhrases: () => void;
   play: () => void;
   pause: () => void;
@@ -198,6 +199,13 @@ export const PlayerProvider: React.FC<Props> = ({
     const phraseUpdated = merge(phrase, phraseUpdate);
     phrases[phraseIndex] = phraseUpdated;
     updatePhrases({ phrases, randomIds: false });
+  };
+
+  const removePhrase = (id: string) => {
+    if (wavesurferRef.current) {
+      const region = wavesurferRef.current.regions.list[id];
+      region.remove();
+    }
   };
 
   const removePhrases = () => {
@@ -361,6 +369,7 @@ export const PlayerProvider: React.FC<Props> = ({
   const methods = {
     updatePhrases,
     updatePhrase,
+    removePhrase,
     removePhrases,
     setMediaLink,
     setCurrentTime,
