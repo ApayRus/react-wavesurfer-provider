@@ -144,10 +144,6 @@ export const initWavesurfer = ({
     updateCurrentPhraseNum();
   });
 
-  wavesurfer.on('region-out', (/* region: Phrase */) => {
-    updateCurrentPhraseNum();
-  });
-
   wavesurfer.on('seek', (/* region: Phrase */) => {
     updatePlayerState({
       currentTime: wavesurfer.getCurrentTime(),
