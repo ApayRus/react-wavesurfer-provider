@@ -140,9 +140,9 @@ export const initWavesurfer = ({
     updateCurrentPhraseNum();
   });
 
-  /*   wavesurfer.on('region-out', () => {
+  wavesurfer.on('region-out', () => {
     updateCurrentPhraseNum();
-  }); */
+  });
 
   wavesurfer.on('seek', (/* region: Phrase */) => {
     updatePlayerState({
