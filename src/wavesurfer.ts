@@ -136,12 +136,7 @@ export const initWavesurfer = ({
   });
 
   wavesurfer.on('region-in', (region: Phrase) => {
-    // console.log(region.id);
-    setPlayerState(oldState => {
-      const { id = 0 } = region;
-      return { ...oldState, currentPhraseNum: +id };
-    });
-    // updateCurrentPhraseNum();
+    updateCurrentPhraseNum();
   });
 
   /*   wavesurfer.on('region-out', () => {
