@@ -137,7 +137,6 @@ export const initWavesurfer = ({
 
   wavesurfer.on('region-in', (region: Phrase) => {
     // console.log(region.id);
-    wavesurfer.setDisabledEventEmissions(['region-in']);
     setPlayerState(oldState => {
       const { id = 0 } = region;
       return { ...oldState, currentPhraseNum: +id };
@@ -145,10 +144,9 @@ export const initWavesurfer = ({
     // updateCurrentPhraseNum();
   });
 
-  wavesurfer.on('region-out', () => {
-    wavesurfer.setDisabledEventEmissions([]);
-    // updateCurrentPhraseNum();
-  });
+  /*   wavesurfer.on('region-out', () => {
+    updateCurrentPhraseNum();
+  }); */
 
   wavesurfer.on('seek', (/* region: Phrase */) => {
     updatePlayerState({
