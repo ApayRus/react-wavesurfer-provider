@@ -135,7 +135,7 @@ export const initWavesurfer = ({
     updatePhrase(region);
   });
 
-  wavesurfer.on('region-in', (region: Phrase) => {
+  wavesurfer.on('region-in', (/* region: Phrase */) => {
     updateCurrentPhraseNum();
   });
 
