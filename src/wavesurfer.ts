@@ -135,8 +135,9 @@ export const initWavesurfer = ({
     updatePhrase(region);
   });
 
-  wavesurfer.on('region-in', (region: Phrase) => {
-    console.log(region.id);
+  wavesurfer.on('region-in', (region: Phrase, e) => {
+    e.stopPropagation();
+    // console.log(region.id);
     setPlayerState(oldState => {
       const { id = 0 } = region;
       if (oldState?.currentPhraseNum === +id) return oldState;
