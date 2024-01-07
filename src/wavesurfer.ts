@@ -135,22 +135,20 @@ export const initWavesurfer = ({
     updatePhrase(region);
   });
 
-  wavesurfer.on('region-in', (region: Phrase, e) => {
-    e.stopPropagation();
+  wavesurfer.on('region-in', (region: Phrase) => {
     // console.log(region.id);
+    wavesurfer.setDisabledEventEmissions(['region-in']);
     setPlayerState(oldState => {
       const { id = 0 } = region;
-      if (oldState?.currentPhraseNum === +id) return oldState;
-      else {
-        return { ...oldState, currentPhraseNum: +id };
-      }
+      return { ...oldState, currentPhraseNum: +id };
     });
     // updateCurrentPhraseNum();
   });
 
-  /*   wavesurfer.on('region-out', () => {
-    updateCurrentPhraseNum();
-  }); */
+  wavesurfer.on('region-out', () => {
+    wavesurfer.setDisabledEventEmissions([]);
+    // updateCurrentPhraseNum();
+  });
 
   wavesurfer.on('seek', (/* region: Phrase */) => {
     updatePlayerState({
