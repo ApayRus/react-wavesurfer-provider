@@ -96,17 +96,8 @@ export const initWavesurfer = ({
 
   const updateCurrentPhraseNum = (delta = 0) => {
     const currentTime: number = wavesurfer.getCurrentTime() + delta;
-
     setPlayerState(oldState => {
-      const {
-        phrases,
-        playMode,
-        isPlaying,
-        currentPhraseNum: curPhr,
-      } = oldState;
-      if (playMode === 'all' && isPlaying) {
-        return { ...oldState, currentPhraseNum: curPhr + 1 };
-      }
+      const { phrases } = oldState;
       const currentPhraseNum = findCurrentPhraseNum(phrases, currentTime);
       return { ...oldState, currentPhraseNum };
     });
@@ -144,8 +135,12 @@ export const initWavesurfer = ({
     updatePhrase(region);
   });
 
-  wavesurfer.on('region-in', (/* region: Phrase */) => {
-    updateCurrentPhraseNum();
+  wavesurfer.on('region-in', (region: Phrase) => {
+    setPlayerState(oldState => {
+      const { id = 0 } = region;
+      return { ...oldState, currentPhraseNum: +id };
+    });
+    // updateCurrentPhraseNum();
   });
 
   /*   wavesurfer.on('region-out', () => {
