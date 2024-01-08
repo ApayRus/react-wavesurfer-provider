@@ -113,6 +113,13 @@ export const initWavesurfer = ({
     updatePlayerState({ currentTime });
   });
 
+  wavesurfer.on('region-in', (region: Phrase) => {
+    const { id = 0 } = region;
+    setPlayerState(oldState => {
+      return { ...oldState, currentPhraseNum: +id };
+    });
+  });
+
   wavesurfer.on('region-click', (region, event) => {
     updatePlayerState({ playMode: 'phrase' });
     event.stopPropagation();
