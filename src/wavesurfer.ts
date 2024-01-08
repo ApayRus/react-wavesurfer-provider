@@ -135,10 +135,6 @@ export const initWavesurfer = ({
     updatePhrase(region);
   });
 
-  wavesurfer.on('region-in', (/* region: Phrase */) => {
-    updateCurrentPhraseNum();
-  });
-
   /*   wavesurfer.on('region-out', () => {
     updateCurrentPhraseNum();
   }); */

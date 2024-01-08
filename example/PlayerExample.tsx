@@ -62,7 +62,7 @@ function PlayerExample() {
       const { id, start, end, body: text } = elem;
       return { id, start, end, data: { text } };
     }) as Phrase[];
-    playerMethods.updatePhrases({ phrases });
+    playerMethods.updatePhrases({ phrases, randomIds: false, replace: true });
   };
 
   const addPeaks = () => {
@@ -146,7 +146,7 @@ function PlayerExample() {
       </section>
       <section className="phrases">
         <h3>Phrases</h3>
-        <div className="phrasesToPlay">
+        {/*  <div className="phrasesToPlay">
           Click to play phrase:{' '}
           {playerState.phrases.slice(1).map((elem, index) => {
             return (
@@ -172,7 +172,7 @@ function PlayerExample() {
               </div>
             );
           })}
-        </div>
+        </div> */}
         <div>
           <textarea
             id="phrasesTextarea"

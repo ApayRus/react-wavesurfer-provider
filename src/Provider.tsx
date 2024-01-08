@@ -134,6 +134,8 @@ export const PlayerProvider: React.FC<Props> = ({
     });
 
     wavesurferRef.current = wavesurfer;
+    console.log('wavesurfer');
+    console.log(wavesurfer);
     updatePhrases({ phrases: [] });
   }, [state.mediaLink, mediaLinkProp]);
 
@@ -162,6 +164,15 @@ export const PlayerProvider: React.FC<Props> = ({
     if (replace) {
       if (wavesurferRef.current) {
         wavesurferRef.current.clearRegions();
+        console.log('we here');
+        wavesurferRef.current.regions.un('region-in', () => {});
+        wavesurferRef.current.on('region-in', (region: Phrase) => {
+          const { id = 0 } = region;
+          console.log(id);
+          setState(oldState => {
+            return { ...oldState, currentPhraseNum: +id };
+          });
+        });
       }
     }
 
@@ -211,6 +222,7 @@ export const PlayerProvider: React.FC<Props> = ({
   const removePhrases = () => {
     if (wavesurferRef.current) {
       wavesurferRef.current.clearRegions();
+      wavesurferRef.current.regions.un('region-in', () => {});
       updateState({ phrases: [zeroPhrase] });
     }
   };

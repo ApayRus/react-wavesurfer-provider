@@ -38,6 +38,7 @@ const App = () => {
         mediaLink,
         phrasesProps,
         wavesurferOptions: { minPxPerSec: 150 },
+        regionsOptions: { contentEditable: false },
         peeks: [],
       }}
     >
