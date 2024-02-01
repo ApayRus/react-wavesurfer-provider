@@ -116,8 +116,10 @@ export const initWavesurfer = ({
   wavesurfer.on('region-in', (region: Phrase) => {
     const { id: currentPhraseId = '0' } = region;
     setPlayerState(oldState => {
-      const { phrases, currentTime } = oldState;
-      const currentPhraseNum = findCurrentPhraseNum(phrases, currentTime);
+      const currentPhraseNum = getCurrentPhraseNum({
+        wavesurfer,
+        id: currentPhraseId,
+      });
       return { ...oldState, currentPhraseNum, currentPhraseId };
     });
   });
@@ -215,4 +217,22 @@ export function renderWaveform({
     wavesurfer.load(mediaElement); //generate peaks on client side
   }
   mediaElement.controls = controls; //wavesurfer.load removes controls, we want to save them
+}
+
+function getCurrentPhraseNum({
+  wavesurfer,
+  id,
+}: {
+  wavesurfer: WaveSurfer;
+  id: string;
+}) {
+  return Object.keys(wavesurfer.regions.list)
+    .map(key => {
+      const { id, start, end } = wavesurfer.regions.list[key];
+      return { id, start, end };
+    })
+    .sort((a, b) => {
+      return a.start - b.start;
+    })
+    .findIndex(elem => elem.id === id);
 }
