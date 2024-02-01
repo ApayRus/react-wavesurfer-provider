@@ -39,6 +39,7 @@ export interface PlayerContextState {
   isReady: boolean;
   isFinished: boolean;
   currentPhraseNum: number;
+  currentPhraseId: string;
   duration: number;
   peaks: number[];
   playMode: 'all' | 'phrase' | 'dictation';
@@ -88,6 +89,7 @@ export const defaultPlayerState = {
   isReady: false,
   currentTime: 0,
   currentPhraseNum: 0,
+  currentPhraseId: '0',
   isPlaying: false,
   isFinished: false,
   duration: 0,
