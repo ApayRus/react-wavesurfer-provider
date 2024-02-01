@@ -114,9 +114,11 @@ export const initWavesurfer = ({
   });
 
   wavesurfer.on('region-in', (region: Phrase) => {
-    const { id = 0 } = region;
+    const { id: currentPhraseId = '0' } = region;
     setPlayerState(oldState => {
-      return { ...oldState, currentPhraseNum: +id, currentPhraseId: id + '' };
+      const { phrases, currentTime } = oldState;
+      const currentPhraseNum = findCurrentPhraseNum(phrases, currentTime);
+      return { ...oldState, currentPhraseNum, currentPhraseId };
     });
   });
 
