@@ -125,7 +125,7 @@ export const initWavesurfer = ({
   });
 
   wavesurfer.on('region-click', (region, event) => {
-    updatePlayerState({ playMode: 'phrase' });
+    updatePlayerState({ playMode: 'all' });
     event.stopPropagation();
     region.play();
   });
