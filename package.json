@@ -10,11 +10,14 @@
 		"@types/react-dom": "^18.3.5",
 		"frazy-parser": "^2.10.2",
 		"lodash-es": "^4.17.21",
-		"react": "^18.3.1",
-		"react-dom": "^18.3.1",
 		"typescript": "^4.9.5",
 		"wavesurfer.js": "github:ApayRus/wavesurfer.js#v6",
 		"web-vitals": "^2.1.4"
+	},
+	"bundleDependencies": [],
+	"peerDependencies": {
+		"react": ">=16.8.0",
+		"react-dom": ">=16.8.0"
 	},
 	"scripts": {
 		"start": "react-scripts start",
@@ -49,8 +52,7 @@
 	"module": "dist/index.esm.js",
 	"types": "dist/index.d.ts",
 	"files": [
-		"dist",
-		"src"
+		"dist"
 	],
 	"keywords": [],
 	"author": "aparus",
