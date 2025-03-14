@@ -1,5 +1,5 @@
 {
-	"name": "wavesurfer-player-provider",
+	"name": "react-wavesurfer-provider",
 	"version": "0.1.0",
 	"private": false,
 	"dependencies": {
