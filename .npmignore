@@ -4,5 +4,11 @@ node_modules
 .vscode
 public
 build
+src
 *.log
 *.tgz
+.DS_Store
+.env*
+rollup.config.js
+tsconfig.json
+.gitignore
