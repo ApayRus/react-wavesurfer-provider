@@ -15,19 +15,45 @@ const rollupConfig = {
 			file: packageJson.main,
 			format: 'cjs',
 			sourcemap: true,
-			name: 'react-component-library'
+			name: 'react-wavesurfer-provider',
+			globals: {
+				react: 'React',
+				'react-dom': 'ReactDOM',
+				'wavesurfer.js': 'WaveSurfer'
+			}
 		},
 		{
 			file: packageJson.module,
 			format: 'esm',
-			sourcemap: true
+			sourcemap: true,
+			globals: {
+				react: 'React',
+				'react-dom': 'ReactDOM',
+				'wavesurfer.js': 'WaveSurfer'
+			}
 		}
+	],
+	external: [
+		'react',
+		'react-dom',
+		'wavesurfer.js',
+		'wavesurfer.js/src/plugin/regions',
+		'wavesurfer.js/src/plugin/timeline'
 	],
 	plugins: [
 		external(),
-		resolve(),
-		commonjs(),
-		typescript({ tsconfig: './tsconfig.json' }),
+		resolve({
+			browser: true,
+			preferBuiltins: false
+		}),
+		commonjs({
+			include: /node_modules/
+		}),
+		typescript({
+			tsconfig: './tsconfig.json',
+			sourceMap: true,
+			inlineSources: true
+		}),
 		postcss({
 			extensions: ['.css'],
 			minimize: true,

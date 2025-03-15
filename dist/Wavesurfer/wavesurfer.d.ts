@@ -10,11 +10,11 @@ interface InitProps {
     setPlayerState: React.Dispatch<React.SetStateAction<PlayerContextState>>;
     peaks?: number[];
 }
-export declare const initWavesurfer: ({ phrases, regionsOptions, wavesurferOptions, setPlayerState, peaks, }: InitProps) => WaveSurfer;
+export declare const initWavesurfer: ({ phrases, regionsOptions, wavesurferOptions, setPlayerState, peaks }: InitProps) => WaveSurfer;
 interface RenderWaveformProps {
     mediaElement: HTMLMediaElement;
     wavesurfer: WaveSurfer;
     peaks?: number[];
 }
-export declare function renderWaveform({ mediaElement, wavesurfer, peaks, }: RenderWaveformProps): void;
+export declare function renderWaveform({ mediaElement, wavesurfer, peaks }: RenderWaveformProps): void;
 export {};
