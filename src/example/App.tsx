@@ -40,9 +40,10 @@ function App() {
 	return (
 		<div className='App'>
 			<header className='App-header'>
-				<h1>Demo: React Wavesurfer Provider</h1>
+				<h1>React Wavesurfer Provider</h1>
 				<p>
-					A React component library for audio visualization and manipulation
+					A React provider wrapper for wavesurfer.js, for subtitles editor and
+					phrasal player
 				</p>
 			</header>
 

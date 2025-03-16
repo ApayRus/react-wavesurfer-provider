@@ -15,11 +15,13 @@
 	"scripts": {
 		"start": "react-scripts start",
 		"build": "react-scripts build",
+		"build:local": "cross-env PUBLIC_URL=./ react-scripts build",
+		"build:github": "cross-env PUBLIC_URL=https://apayrus.github.io/react-wavesurfer-provider react-scripts build",
 		"test": "react-scripts test",
 		"eject": "react-scripts eject",
 		"build:lib": "rollup -c",
 		"prepublishOnly": "npm run build:lib",
-		"predeploy": "npm run build",
+		"predeploy": "npm run build:github",
 		"deploy": "gh-pages -d build"
 	},
 	"eslintConfig": {
@@ -64,6 +66,7 @@
 		"@types/react": "^18.3.18",
 		"@types/react-dom": "^18.3.5",
 		"@types/wavesurfer.js": "^6.0.12",
+		"cross-env": "^7.0.3",
 		"gh-pages": "^6.3.0",
 		"react-scripts": "^5.0.1",
 		"rollup-plugin-peer-deps-external": "^2.2.4",
@@ -76,5 +79,5 @@
 	"engines": {
 		"node": ">=10"
 	},
-	"homepage": "https://apayrus.github.io/react-wavesurfer-provider"
+	"homepage": "."
 }
