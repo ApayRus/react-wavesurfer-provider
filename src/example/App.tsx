@@ -42,7 +42,7 @@ function App() {
 			<header className='App-header'>
 				<h1>React Wavesurfer Provider</h1>
 				<p>
-					A React provider wrapper for wavesurfer.js, for subtitles editor and
+					A React provider wrapper for wavesurfer.js, subtitles editor and
 					phrasal player
 				</p>
 			</header>
